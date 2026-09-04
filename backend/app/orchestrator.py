@@ -52,6 +52,10 @@ class Orchestrator:
 
     def _process(self, rec: EventRecord) -> None:
         ev = rec.event
+        # A real Razorpay-confirmed payment is ground truth — never let the
+        # simulator overwrite it. (store pre-locks these to RECOVERED.)
+        if rec.status == EventStatus.RECOVERED:
+            return
         rec.status = EventStatus.IN_RECOVERY
         self._log(rec, "detect", "agent",
                   f"Detected {ev.type.value} of ₹{ev.amount_paise // 100:,} for {ev.customer.name}.",
