@@ -1,0 +1,19 @@
+# Render Blueprint — deploy Salus as one Docker web service.
+# In Render: New + → Blueprint → pick this repo. Then set the secret env vars below.
+services:
+  - type: web
+    name: salus
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: SALUS_MODE
+        value: simulate
+      - key: SALUS_SEED
+        value: "7"
+      - key: RAZORPAY_KEY_ID
+        sync: false        # set in the Render dashboard (secret)
+      - key: RAZORPAY_KEY_SECRET
+        sync: false        # set in the Render dashboard (secret)
+      - key: SALUS_WEBHOOK_SECRET
+        sync: false        # set after you create the Razorpay webhook
