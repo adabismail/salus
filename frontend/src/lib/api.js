@@ -25,6 +25,7 @@ export const liveVerify = () => fetch("/api/live/verify", { method: "POST" }).th
 export const liveRecover = (limit = 8) =>
   fetch(`/api/live/recover_batch?limit=${limit}`, { method: "POST" }).then(J);
 export const liveSync = () => fetch("/api/live/sync", { method: "POST" }).then(J);
+export const liveImport = () => fetch("/api/live/import", { method: "POST" }).then(J);
 
 // Server-Sent-Events run feed. Returns a cancel function.
 export function runStream({ onEvent, onDone, onError }) {

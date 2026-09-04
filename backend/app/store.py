@@ -39,6 +39,8 @@ class Store:
             info = self.live_links.get(rec.event.id)
             if not info or info.get("status") != "paid":
                 continue
+            if rec.status == EventStatus.RECOVERED and rec.outcome.recovered:
+                continue  # already locked in — don't duplicate audit entries
             amt = info.get("amount_paid_paise") or info["amount_paise"]
             rec.diagnosis = diagnose(rec.event)
             rec.status = EventStatus.RECOVERED

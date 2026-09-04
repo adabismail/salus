@@ -79,3 +79,13 @@ def verify_webhook_signature(raw_body: bytes, signature: str) -> bool:
         return False
     expected = hmac.new(secret.encode(), raw_body, hashlib.sha256).hexdigest()
     return hmac.compare_digest(expected, signature)
+
+
+def list_payment_links(count: int = 100) -> list[dict]:
+    """Every payment link on the account. Read-only, so it isn't throttled the
+    way link creation is — this is how we recover state after a restart."""
+    with httpx.Client(timeout=25) as c:
+        r = c.get(f"{_BASE}/payment_links", params={"count": count}, auth=_auth())
+        r.raise_for_status()
+        data = r.json()
+    return data.get("payment_links") or data.get("items") or []

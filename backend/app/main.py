@@ -258,6 +258,59 @@ async def razorpay_webhook(request: Request) -> dict:
     return {"ok": True}
 
 
+@app.post("/api/live/import")
+def live_import() -> dict:
+    """Re-attach payment links that already exist on the Razorpay account.
+
+    Link state lives in memory, so a restart loses it - but the links themselves
+    live on in Razorpay. This pulls them back (and picks up any paid meanwhile)
+    without creating anything, which also sidesteps the create rate limit.
+    """
+    _require_keys()
+    try:
+        links = live.list_payment_links()
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(502, f"Could not list Razorpay links: {exc}")
+
+    by_event = {r.event.id: r for r in store.records}
+    by_key = {}
+    for r in store.records:
+        by_key.setdefault((r.event.customer.name.strip().lower(), r.event.amount_paise), r)
+
+    # Paid links win when several match the same event.
+    links = sorted(links, key=lambda l: 0 if l.get("status") == "paid" else 1)
+
+    touched = set()
+    paid = 0
+    for l in links:
+        eid = (l.get("notes") or {}).get("salus_event_id")
+        rec = by_event.get(eid) if eid else None
+        if rec is None:
+            name = ((l.get("customer") or {}).get("name") or "").strip().lower()
+            rec = by_key.get((name, l.get("amount")))
+        if rec is None:
+            continue
+        existing = store.live_links.get(rec.event.id)
+        if existing and existing.get("status") == "paid":
+            continue
+        store.live_links[rec.event.id] = {
+            "event_id": rec.event.id, "customer": rec.event.customer.name,
+            "link_id": l["id"], "short_url": l.get("short_url", ""),
+            "amount_paise": l.get("amount", rec.event.amount_paise),
+            "status": l.get("status", "created"),
+            "amount_paid_paise": l.get("amount_paid", 0),
+        }
+        touched.add(rec.event.id)
+        if l.get("status") == "paid":
+            paid += 1
+
+    store._apply_live_recoveries()
+    imported = len(touched)
+    message = (f"Imported {imported} existing Razorpay link(s) - {paid} already paid."
+               if imported else "No matching links found on your Razorpay account.")
+    return {"imported": imported, "paid": paid, "message": message}
+
+
 _static_dir = os.getenv("SALUS_STATIC_DIR")
 if _static_dir and os.path.isdir(_static_dir):
     app.mount("/", StaticFiles(directory=_static_dir, html=True), name="static")

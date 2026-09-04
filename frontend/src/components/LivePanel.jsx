@@ -19,12 +19,25 @@ export default function LivePanel({ onChange }) {
     setBusy("create");
     setMsg(null);
     try {
-      const res = await api.liveRecover(6);
+      const res = await api.liveRecover(2);
       setMsg({ text: res.message || `Created ${res.created}.`, bad: !res.created });
       await load();
       onChange && onChange();
     } catch {
       setMsg({ text: "Couldn't reach the server — it may still be waking up. Try again in a few seconds.", bad: true });
+    } finally { setBusy(""); }
+  };
+
+  const importLinks = async () => {
+    setBusy("import");
+    setMsg(null);
+    try {
+      const res = await api.liveImport();
+      setMsg({ text: res.message, bad: !res.imported });
+      await load();
+      onChange && onChange();
+    } catch {
+      setMsg({ text: "Import failed - the server may be waking up. Try again.", bad: true });
     } finally { setBusy(""); }
   };
 
@@ -64,7 +77,11 @@ export default function LivePanel({ onChange }) {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+        <button className="btn btn--go" style={{ boxShadow: "3px 3px 0 var(--ink)", padding: "8px 12px", fontSize: 12 }}
+          disabled={busy} onClick={importLinks}>
+          {busy === "import" ? "Importing…" : "⤓ Import from Razorpay"}
+        </button>
         <button className="btn btn--ghost" style={{ boxShadow: "3px 3px 0 var(--ink)", padding: "8px 12px", fontSize: 12 }}
           disabled={busy} onClick={createLinks}>
           {busy === "create" ? "Creating…" : "＋ Create real links"}
