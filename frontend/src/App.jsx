@@ -19,12 +19,25 @@ export default function App() {
   const [liveStatus, setLiveStatus] = useState({});
   const [selectedId, setSelectedId] = useState(null);
   const [ticker, setTicker] = useState("");
+  const [booting, setBooting] = useState(true);
 
   const loadAll = useCallback(async () => {
-    const [cfg, recs, g] = await Promise.all([api.getConfig(), api.getEvents(), api.getGuardrails()]);
-    setConfig(cfg);
-    setRecords(recs);
-    setGuardrails(g);
+    // Free-tier hosts cold-start slowly; retry so a first open never lands on an
+    // empty dashboard.
+    for (let attempt = 0; attempt < 8; attempt++) {
+      try {
+        const [cfg, recs, g] = await Promise.all([api.getConfig(), api.getEvents(), api.getGuardrails()]);
+        setConfig(cfg);
+        setRecords(recs);
+        setGuardrails(g);
+        setBooting(false);
+        return;
+      } catch {
+        setBooting(true);
+        await new Promise((r) => setTimeout(r, 1500));
+      }
+    }
+    setBooting(false);
   }, []);
 
   useEffect(() => { loadAll(); }, [loadAll]);
@@ -89,6 +102,12 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      {booting && (
+        <div className="card card--flat" style={{ marginBottom: 12, background: "var(--cyan)" }}>
+          <b>⏳ Waking up the server…</b> free-tier cold start — this takes a few seconds on first load.
+        </div>
+      )}
 
       <div className="hero">
         <MetricCard label="At Risk" accent="var(--pink)"

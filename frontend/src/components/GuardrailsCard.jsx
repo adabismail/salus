@@ -7,7 +7,7 @@ function NumRow({ label, value, unit, onChange, disabled, step = 1, min = 0 }) {
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         <input
           type="number"
-          value={value}
+          value={Number.isFinite(value) ? value : 0}
           step={step}
           min={min}
           disabled={disabled}
