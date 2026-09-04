@@ -1,0 +1,8 @@
+# Salus — Revenue Recovery Agent (backend)
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+httpx==0.28.1
+python-dotenv==1.0.1
+# Optional — enables real LLM diagnosis + Hinglish copy. Falls back to deterministic engine if absent.
+anthropic==0.42.0
