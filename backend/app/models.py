@@ -191,7 +191,8 @@ class Guardrails(BaseModel):
     min_gap_hours: int = 20
     quiet_start_hour: int = 21         
     quiet_end_hour: int = 8         
-    max_auto_amount_paise: int = 50_00_000       
+    max_auto_amount_paise: int = 50_00_000       # ₹50,000 auto-charge ceiling
+    human_review_amount_paise: int = 2_00_00_000  # ₹2,00,000 — any action above goes to a human       
     max_discount_pct: int = 10          
     respect_opt_out: bool = True
     escalate_risk_blocked: bool = True  
