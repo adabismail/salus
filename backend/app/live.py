@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import time
 
 import httpx
 
@@ -45,10 +46,23 @@ def create_payment_link(ev: RevenueEvent) -> dict:
         "reminder_enable": False,
         "notes": {"salus_event_id": ev.id, "root": (ev.error_reason or ev.type.value)},
     }
-    with httpx.Client(timeout=20) as c:
-        r = c.post(f"{_BASE}/payment_links", json=payload, auth=_auth())
-        r.raise_for_status()
+    # Razorpay rate-limits bursts (429). Back off and retry rather than failing
+    # the whole batch on the first throttled call.
+    delays = (1.2, 2.5, 4.0)
+    last_error = "unknown error"
+    for attempt in range(len(delays) + 1):
+        with httpx.Client(timeout=20) as c:
+            r = c.post(f"{_BASE}/payment_links", json=payload, auth=_auth())
+        if r.status_code == 429:
+            last_error = "Razorpay rate limit (429)"
+            if attempt < len(delays):
+                time.sleep(delays[attempt])
+                continue
+            break
+        if r.status_code >= 400:
+            raise RuntimeError(f"Razorpay {r.status_code}: {r.text[:200]}")
         return r.json()
+    raise RuntimeError(f"{last_error} — too many links created too quickly; wait a few seconds and retry.")
 
 
 def fetch_payment_link(link_id: str) -> dict:

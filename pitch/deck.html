@@ -338,13 +338,15 @@
   </section>
 
   <!-- 9 · LIVE DEMO -->
-  <section class="slide liveslide" data-notes="[3:24 → SWITCH TO THE APP] Let me show you it's real, not slides. (1) I hit Run Recovery — the agent works 52 real at-risk payments in one pass, and you watch the recovered total climb. (2) I open a fraud-flagged case — and the policy engine REFUSES to auto-retry it, and escalates to a human. That's the guardrail, live. (3) And the moment that matters: in the Live panel, the agent creates a REAL Razorpay test-mode payment link. I open it, I pay it — and Salus syncs from Razorpay and marks it recovered. A real link, a real payment, really recovered.">
+  <section class="slide liveslide" data-notes="[3:24 → SWITCH TO THE APP] <b>① THE LEDGER</b> — This is the at-risk ledger: 52 real failure events. Each row is a customer, the failure type — failed payment, abandoned checkout, failed subscription, overdue invoice — the amount, and its status. <b>② RUN IT</b> — I hit Run Recovery. The agent works every case live: statuses flip, the recovered total climbs. One pass: ₹1.9 lakh recovered, 62% of addressable, ₹14 of cost. <b>③ OPEN A CASE</b> — Click a recovered one. Top: the raw failure — the Razorpay error reason, source, attempts. Then the DIAGNOSIS: root cause, confidence, and the exact signals it reasoned over. Then the ACTION it took, with the gate chip showing ALLOW. Then the AUDIT TRAIL: detect, diagnose, plan, gate, execute, outcome, stop — every decision, in order, with the why. <b>④ HUMAN INTERVENTION</b> — Now a fraud-flagged case. Diagnosis says risk blocked, not recoverable. The gate says ESCALATE — the policy engine refuses to auto-retry and hands it to a human. That's not a failure, it's the design: escalation is a valid outcome. <b>⑤ REAL RAZORPAY</b> — Live panel. I click Create real links: the agent calls Razorpay's real API and mints genuine test-mode payment links — real rzp.io URLs. I open one: the real Razorpay checkout, in Test Mode. I pay it. Back in Salus, I hit Sync from Razorpay — it polls the real payment status, the link flips to paid, and Recovered (real) updates with actual rupees. <b>⑥ IT HOLDS</b> — And when I re-run the batch, that real payment stays recovered — a confirmed payment is ground truth; the simulation can never overwrite it.">
     <div class="wrap">
       <div class="livebig"><span class="dot">●</span> LIVE</div>
       <div class="cuelist">
-        <div class="cue"><b>01</b> Run the batch — watch ₹ recovered climb across 52 payments</div>
-        <div class="cue"><b>02</b> Fraud flag → the policy engine <em>refuses</em> and escalates</div>
-        <div class="cue star"><b>03</b> A real Razorpay link → I pay it → it recovers, live</div>
+        <div class="cue"><b>01</b> The ledger — 52 at-risk payments, then Run Recovery</div>
+        <div class="cue"><b>02</b> Open a case — diagnosis, signals, gate, full audit trail</div>
+        <div class="cue"><b>03</b> Fraud flag → policy <em>refuses</em> → human intervention</div>
+        <div class="cue star"><b>04</b> Real Razorpay link → pay → Sync → recovered</div>
+        <div class="cue"><b>05</b> Re-run — the real payment holds, sim can't overwrite it</div>
       </div>
     </div>
   </section>

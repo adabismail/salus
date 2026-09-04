@@ -173,3 +173,47 @@
 .tl__summary { font-size: 13px; font-weight: 600; margin-top: 1px; }
 
 .empty { text-align: center; color: var(--muted); font-weight: 600; padding: 30px; font-size: 14px; }
+
+/* ---- responsive ---------------------------------------------------- */
+/* Desktop: the sidebar stack is much taller than the ledger, which left a
+   big empty gutter on the left when scrolling. Stick the ledger and let it
+   grow with the viewport instead. */
+@media (min-width: 981px) {
+  .layout > .card { position: sticky; top: 16px; }
+  .tlist { max-height: calc(100vh - 260px); }
+}
+
+@media (max-width: 980px) {
+  .tlist { max-height: 70vh; }
+}
+
+@media (max-width: 640px) {
+  .app { padding: 12px; }
+  .header { flex-wrap: wrap; gap: 12px; }
+  .brand { gap: 10px; }
+  .brand__mark { font-size: 22px; padding: 6px 11px; }
+  .brand__title { font-size: 20px; }
+  .brand__sub { font-size: 11px; }
+  .header__right { flex-wrap: wrap; gap: 8px; }
+
+  .hero { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .metric { padding: 18px 12px 12px; }
+  .metric::before { height: 7px; }
+  .metric__value { font-size: 21px; }
+  .metric__value--lg { font-size: 23px; }
+  .metric__label { font-size: 10px; }
+  .metric__sub { font-size: 11px; }
+
+  /* Four columns don't fit a phone — drop the Type cell, keep who/amount/status */
+  .thead, .trow { grid-template-columns: 1.5fr 0.9fr auto; gap: 8px; }
+  .thead > :nth-child(2), .trow > :nth-child(2) { display: none; }
+  .trow .who { font-size: 13px; }
+  .trow .amt { font-size: 13px; }
+  .tlist { max-height: 62vh; }
+
+  .runbar { flex-wrap: wrap; }
+  .ticker { font-size: 11.5px; line-height: 1.4; }
+
+  .drawer { width: 100vw; padding: 14px; }
+  .kv { grid-template-columns: auto 1fr; font-size: 12.5px; }
+}

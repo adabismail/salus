@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import time
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -136,6 +137,8 @@ def live_recover_batch(limit: int = 8) -> dict:
     genuinely-recoverable events. These appear in the merchant's dashboard."""
     _require_keys()
     created: list[dict] = []
+    errors: list[str] = []
+    eligible = 0
     for rec in store.records:
         if len(created) >= limit:
             break
@@ -148,11 +151,18 @@ def live_recover_batch(limit: int = 8) -> dict:
             continue
         if ev.amount_paise > store.guardrails.human_review_amount_paise:
             continue
+        eligible += 1
+        if created:
+            time.sleep(0.4)  # space the calls out; Razorpay throttles bursts
         try:
             link = live.create_payment_link(ev)
-        except Exception as exc:  # noqa: BLE001 - surface, don't crash the batch
+        except Exception as exc:  # noqa: BLE001 - report it, don't fail silently
+            msg = str(exc)
+            errors.append(f"{ev.customer.name}: {msg[:160]}")
             rec.audit.append(AuditEntry(event_id=ev.id, phase="execute", actor="razorpay",
-                                        summary=f"Razorpay link creation failed: {exc}"))
+                                        summary=f"Razorpay link creation failed: {msg[:200]}"))
+            if "429" in msg or "rate limit" in msg.lower():
+                break  # throttled — stop hammering and report back
             continue
         store.live_links[ev.id] = {
             "event_id": ev.id, "customer": ev.customer.name,
@@ -171,7 +181,16 @@ def live_recover_batch(limit: int = 8) -> dict:
                                     summary=f"Created REAL Razorpay test link for ₹{ev.amount_paise // 100:,}.",
                                     detail={"link_id": link["id"], "short_url": link["short_url"]}))
         created.append(store.live_links[ev.id])
-    return {"created": len(created), "links": created}
+
+    if created:
+        message = f"Created {len(created)} real Razorpay test link(s)."
+    elif errors:
+        message = errors[0]
+    elif eligible == 0:
+        message = "No eligible events left — every recoverable event already has a link. Hit Sync, or reset the batch."
+    else:
+        message = "Nothing was created."
+    return {"created": len(created), "links": created, "errors": errors, "message": message}
 
 
 @app.post("/api/live/sync")

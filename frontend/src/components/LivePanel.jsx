@@ -5,6 +5,7 @@ import { compactInr, inr } from "../lib/format.js";
 export default function LivePanel({ onChange }) {
   const [live, setLive] = useState(null);
   const [busy, setBusy] = useState("");
+  const [msg, setMsg] = useState(null); // { text, bad }
 
   const load = useCallback(async () => {
     try { setLive(await api.liveState()); } catch { setLive({ configured: false }); }
@@ -16,11 +17,29 @@ export default function LivePanel({ onChange }) {
 
   const createLinks = async () => {
     setBusy("create");
-    try { await api.liveRecover(8); await load(); onChange && onChange(); } finally { setBusy(""); }
+    setMsg(null);
+    try {
+      const res = await api.liveRecover(6);
+      setMsg({ text: res.message || `Created ${res.created}.`, bad: !res.created });
+      await load();
+      onChange && onChange();
+    } catch {
+      setMsg({ text: "Couldn't reach the server — it may still be waking up. Try again in a few seconds.", bad: true });
+    } finally { setBusy(""); }
   };
+
   const sync = async () => {
     setBusy("sync");
-    try { await api.liveSync(); await load(); onChange && onChange(); } finally { setBusy(""); }
+    setMsg(null);
+    try {
+      const res = await api.liveSync();
+      const paid = "₹" + Math.round((res.paid_paise || 0) / 100).toLocaleString("en-IN");
+      setMsg({ text: `Synced ${res.tracked} link(s) from Razorpay — ${res.paid} paid (${paid}).`, bad: false });
+      await load();
+      onChange && onChange();
+    } catch {
+      setMsg({ text: "Sync failed — the server may be waking up. Try again.", bad: true });
+    } finally { setBusy(""); }
   };
 
   return (
@@ -55,6 +74,18 @@ export default function LivePanel({ onChange }) {
           {busy === "sync" ? "Syncing…" : "⟳ Sync from Razorpay"}
         </button>
       </div>
+
+      {msg && (
+        <div
+          style={{
+            border: "2.5px solid var(--ink)", boxShadow: "3px 3px 0 var(--ink)",
+            padding: "9px 11px", marginBottom: 10, fontSize: 12.5, fontWeight: 600, lineHeight: 1.35,
+            background: msg.bad ? "#fff1f1" : "#e9fbf1",
+          }}
+        >
+          {msg.bad ? "⚠ " : "✓ "}{msg.text}
+        </div>
+      )}
 
       <div className="exc" style={{ maxHeight: 220 }}>
         {(live?.links || []).map((l) => (
