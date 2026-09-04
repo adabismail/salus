@@ -1,0 +1,127 @@
+/* ------------------------------------------------------------------ *
+ * Salus — neo-brutalist design system
+ * Thick ink borders, hard offset shadows, flat bold colour, chunky type.
+ * ------------------------------------------------------------------ */
+:root {
+  --bg: #f3efe2;
+  --ink: #111111;
+  --paper: #ffffff;
+  --muted: #6b6656;
+
+  --yellow: #ffd23f;
+  --pink: #ff5c8a;
+  --cyan: #35d0dd;
+  --lime: #b8f24d;
+  --purple: #bb8bff;
+  --orange: #ff8a1a;
+  --red: #ff4d4d;
+  --green: #14c98a;
+  --blue: #5b8cff;
+
+  --border: 3px solid var(--ink);
+  --shadow: 6px 6px 0 var(--ink);
+  --shadow-sm: 3px 3px 0 var(--ink);
+  --shadow-lg: 10px 10px 0 var(--ink);
+
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-display);
+  /* subtle dotted grid — a neo-brutalist staple */
+  background-image: radial-gradient(var(--ink) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: -11px -11px;
+}
+
+h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; }
+
+button { font-family: var(--font-display); cursor: pointer; }
+
+.mono { font-family: var(--font-mono); }
+.upper { text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ---- primitives --------------------------------------------------- */
+.card {
+  background: var(--paper);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+.card--flat { box-shadow: var(--shadow-sm); }
+
+.btn {
+  border: var(--border);
+  background: var(--yellow);
+  box-shadow: var(--shadow);
+  padding: 12px 20px;
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-lg); }
+.btn:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0 var(--ink); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: var(--shadow); }
+.btn--go { background: var(--lime); }
+.btn--pink { background: var(--pink); }
+.btn--ghost { background: var(--paper); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.chip--recovered { background: var(--green); }
+.chip--escalated { background: var(--orange); }
+.chip--promise_to_pay { background: var(--blue); color: #fff; }
+.chip--lost { background: var(--red); color: #fff; }
+.chip--at_risk { background: #e7e2d3; }
+.chip--in_recovery { background: var(--yellow); }
+.chip--stopped { background: #d9d4c5; }
+
+.tag {
+  display: inline-block;
+  border: 2px solid var(--ink);
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--paper);
+}
+
+/* ---- gate decision colours --------------------------------------- */
+.gate--allow { background: var(--green); }
+.gate--defer { background: var(--cyan); }
+.gate--block { background: var(--red); color: #fff; }
+.gate--escalate { background: var(--orange); }
+
+/* ---- scrollbars (chunky) ----------------------------------------- */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-thumb { background: var(--ink); border: 3px solid var(--bg); }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ---- little animations ------------------------------------------- */
+@keyframes pop { 0% { transform: scale(0.9); } 60% { transform: scale(1.06); } 100% { transform: scale(1); } }
+.pop { animation: pop 0.25s ease; }
+
+@keyframes blink { 50% { opacity: 0.35; } }
+.blink { animation: blink 1s steps(2) infinite; }
+
+@keyframes marchstripe { to { background-position: 40px 0; } }
