@@ -1,0 +1,433 @@
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap"
+  rel="stylesheet"
+/>
+<title>Salus Pitch</title>
+<style>
+  :root {
+    --bg: #f3efe2;
+    --ink: #111111;
+    --paper: #ffffff;
+    --muted: #6b6656;
+    --yellow: #ffd23f;
+    --pink: #ff5c8a;
+    --cyan: #35d0dd;
+    --lime: #b8f24d;
+    --green: #14c98a;
+    --orange: #ff8a1a;
+    --blue: #5b8cff;
+    --purple: #bb8bff;
+    --red: #ff4d4d;
+    --border: 3px solid var(--ink);
+    --shadow: 8px 8px 0 var(--ink);
+    --shadow-sm: 4px 4px 0 var(--ink);
+    --font-display: "Space Grotesk", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink); font-family: var(--font-display); overflow: hidden;
+    background-image: radial-gradient(var(--ink) 1.1px, transparent 1.1px);
+    background-size: 26px 26px; background-position: -13px -13px;
+  }
+  .deck { position: fixed; inset: 0; }
+  .slide {
+    position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center;
+    padding: clamp(26px, 4.5vw, 76px); padding-bottom: clamp(72px, 9vh, 116px);
+  }
+  .slide.active { display: flex; }
+  @media (prefers-reduced-motion: no-preference) {
+    .slide.active { animation: rise 0.28s cubic-bezier(0.2, 0.8, 0.2, 1); }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  }
+  .wrap { width: min(1200px, 100%); margin: 0 auto; }
+
+  h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; line-height: 1.03; }
+  .kicker {
+    font-family: var(--font-mono); font-weight: 700; font-size: clamp(0.68rem, 1.4vw, 0.92rem);
+    text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted); margin-bottom: 16px;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .kicker::before { content: ""; width: 26px; height: 12px; background: var(--accent, var(--yellow)); border: 2.5px solid var(--ink); }
+  .display { font-size: clamp(1.9rem, 5.6vw, 4.6rem); }
+  .h-md { font-size: clamp(1.6rem, 4vw, 3rem); }
+  .lead { font-size: clamp(1rem, 2.1vw, 1.55rem); font-weight: 500; line-height: 1.34; max-width: 40ch; }
+  .mono { font-family: var(--font-mono); }
+  .accentword { background: var(--accent, var(--yellow)); padding: 0 0.14em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  .block { background: var(--paper); border: var(--border); box-shadow: var(--shadow); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px; border: 2.5px solid var(--ink); box-shadow: var(--shadow-sm);
+    padding: 5px 13px; font-weight: 700; font-size: clamp(0.7rem, 1.3vw, 0.92rem);
+    text-transform: uppercase; letter-spacing: 0.05em; background: var(--paper);
+  }
+  .src { margin-top: 16px; font-family: var(--font-mono); font-size: clamp(0.62rem, 1vw, 0.78rem); color: var(--muted); font-weight: 600; }
+
+  /* slide 1 */
+  .brandrow { display: flex; align-items: center; gap: 20px; margin-bottom: clamp(18px, 3.4vh, 40px); }
+  .mark {
+    font-family: var(--font-mono); font-weight: 800; font-size: clamp(1.5rem, 3.6vw, 2.7rem);
+    background: var(--ink); color: var(--yellow); border: var(--border); box-shadow: var(--shadow); padding: 9px 18px;
+  }
+  .wordmark { font-family: var(--font-mono); font-weight: 800; font-size: clamp(2.2rem, 7.5vw, 5.4rem); letter-spacing: 0.04em; }
+  .footerbar {
+    position: absolute; left: clamp(26px, 4.5vw, 76px); right: clamp(26px, 4.5vw, 76px); bottom: clamp(66px, 8vh, 100px);
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  }
+
+  /* voluntary vs involuntary */
+  .define { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(14px, 2vw, 26px); }
+  @media (max-width: 760px) { .define { grid-template-columns: 1fr; } }
+  .def { padding: clamp(18px, 2.2vw, 30px); }
+  .def .tagword { font-family: var(--font-mono); font-weight: 800; font-size: clamp(1.2rem, 2.6vw, 2rem); text-transform: uppercase; letter-spacing: 0.02em; }
+  .def p { margin: 10px 0 0; font-weight: 500; font-size: clamp(0.85rem, 1.5vw, 1.1rem); line-height: 1.35; color: var(--muted); }
+  .def.vol { background: var(--paper); }
+  .def.invol { background: var(--ink); color: var(--bg); box-shadow: var(--shadow); }
+  .def.invol p { color: #d8d3c2; }
+  .def.invol .tagword { color: var(--pink); }
+
+  /* data slide */
+  .stat2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(12px, 1.8vw, 22px); margin-bottom: clamp(14px, 2vh, 22px); }
+  @media (max-width: 720px) { .stat2 { grid-template-columns: 1fr; } }
+  .statcard { padding: clamp(14px, 1.8vw, 24px); position: relative; overflow: hidden; padding-top: clamp(22px, 2.4vw, 30px); }
+  .statcard::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 10px; background: var(--accent); border-bottom: var(--border); }
+  .statcard .n { font-family: var(--font-mono); font-weight: 800; font-size: clamp(1.8rem, 4.6vw, 3.4rem); line-height: 1; }
+  .statcard .c { margin-top: 8px; font-size: clamp(0.78rem, 1.3vw, 1rem); color: var(--muted); font-weight: 600; line-height: 1.3; }
+  .bars { display: flex; flex-direction: column; gap: 10px; }
+  .barhead { font-family: var(--font-mono); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: clamp(0.66rem, 1.1vw, 0.82rem); color: var(--muted); margin-bottom: 2px; }
+  .bar { display: grid; grid-template-columns: minmax(120px, 190px) 1fr auto; align-items: center; gap: 12px; }
+  .bar .lab { font-weight: 600; font-size: clamp(0.78rem, 1.3vw, 1rem); }
+  .bar .track { height: 20px; border: 2.5px solid var(--ink); background: var(--paper); overflow: hidden; }
+  .bar .fill { height: 100%; background: var(--accent); border-right: 2.5px solid var(--ink); }
+  .bar .pct { font-family: var(--font-mono); font-weight: 800; font-size: clamp(0.78rem, 1.3vw, 1rem); font-variant-numeric: tabular-nums; }
+
+  /* vulcan split */
+  .split { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: clamp(14px, 2vw, 28px); }
+  @media (max-width: 760px) { .split { grid-template-columns: 1fr; } .split .arrow { transform: rotate(90deg); justify-self: center; } }
+  .side { padding: clamp(18px, 2.4vw, 34px); display: flex; flex-direction: column; justify-content: center; }
+  .side .role { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.12em; font-size: clamp(0.68rem, 1.3vw, 0.9rem); color: var(--muted); font-weight: 700; }
+  .side .name { font-size: clamp(1.5rem, 3.2vw, 2.6rem); font-weight: 700; margin-top: 6px; }
+  .side .sub { margin-top: 10px; font-weight: 500; font-size: clamp(0.82rem, 1.4vw, 1.05rem); line-height: 1.35; }
+  .side.vulcan { background: var(--paper); }
+  .side.salus { background: var(--ink); color: var(--bg); box-shadow: var(--shadow); }
+  .side.salus .role { color: var(--yellow); }
+  .arrow { align-self: center; font-family: var(--font-mono); font-weight: 800; font-size: clamp(1.6rem, 3vw, 2.6rem); }
+
+  /* steps */
+  .steps { display: grid; gap: clamp(9px, 1.3vw, 15px); grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .steps { grid-template-columns: repeat(5, 1fr); } }
+  .step { padding: clamp(12px, 1.5vw, 19px); }
+  .step .n { font-family: var(--font-mono); font-weight: 800; font-size: clamp(0.72rem, 1.3vw, 0.9rem); color: var(--muted); }
+  .step h3 { font-size: clamp(0.98rem, 1.6vw, 1.3rem); margin-top: 4px; }
+  .step p { margin: 6px 0 0; font-size: clamp(0.72rem, 1.15vw, 0.88rem); color: var(--muted); font-weight: 500; line-height: 1.3; }
+  .step:nth-child(1) { background: var(--pink); } .step:nth-child(1) p { color: #5a1030; }
+  .step:nth-child(2) { background: var(--cyan); } .step:nth-child(2) p { color: #0b4a50; }
+  .step:nth-child(3) { background: var(--yellow); } .step:nth-child(3) p { color: #5c4a00; }
+  .step:nth-child(4) { background: var(--lime); } .step:nth-child(4) p { color: #3a4d00; }
+  .step:nth-child(5) { background: var(--purple); } .step:nth-child(5) p { color: #3d2170; }
+
+  /* control / guardrails */
+  .guards { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(10px, 1.4vw, 16px); }
+  @media (min-width: 820px) { .guards { grid-template-columns: repeat(3, 1fr); } }
+  .guard { background: var(--paper); border: 2.5px solid var(--ink); box-shadow: var(--shadow-sm); padding: 13px 15px; display: flex; flex-direction: column; gap: 3px; }
+  .guard .g-t { font-weight: 700; font-size: clamp(0.85rem, 1.4vw, 1.05rem); }
+  .guard .g-d { font-size: clamp(0.72rem, 1.1vw, 0.86rem); color: var(--muted); font-weight: 500; line-height: 1.28; }
+  .guard.hot { background: var(--orange); } .guard.hot .g-d { color: #5a2e00; }
+
+  /* architecture */
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; justify-content: center; }
+  .node { background: var(--paper); border: 2.5px solid var(--ink); box-shadow: var(--shadow-sm); padding: 12px 14px; min-width: 114px; display: flex; flex-direction: column; gap: 3px; }
+  .node .lbl { font-family: var(--font-mono); font-size: clamp(0.6rem, 0.95vw, 0.74rem); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; }
+  .node .val { font-weight: 700; font-size: clamp(0.78rem, 1.25vw, 0.98rem); }
+  .node.gate { background: var(--yellow); }
+  .node.exec { background: var(--cyan); }
+  .node.audit { background: var(--lime); }
+  .sep { align-self: center; font-family: var(--font-mono); font-weight: 800; font-size: 1.25rem; }
+  .flownote { text-align: center; margin-top: 20px; font-family: var(--font-mono); font-weight: 700; letter-spacing: 0.04em; font-size: clamp(0.78rem, 1.3vw, 1rem); }
+
+  /* live cue */
+  .liveslide { background: var(--ink); }
+  .liveslide .wrap { color: var(--bg); }
+  .livebig { font-family: var(--font-mono); font-weight: 800; font-size: clamp(3rem, 12vw, 9.5rem); line-height: 0.9; letter-spacing: 0.02em; }
+  .livebig .dot { color: var(--green); animation: blink 1.1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0.25; } }
+  .cuelist { display: flex; flex-direction: column; gap: 12px; margin-top: 26px; }
+  .cue { display: flex; align-items: baseline; gap: 14px; font-size: clamp(0.92rem, 1.7vw, 1.3rem); font-weight: 600; }
+  .cue b { font-family: var(--font-mono); color: var(--yellow); }
+  .cue.star { color: var(--lime); }
+  .cue.star b { color: var(--lime); }
+
+  /* metrics */
+  .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(12px, 1.8vw, 22px); }
+  @media (min-width: 900px) { .metrics { grid-template-columns: repeat(4, 1fr); } }
+  .metric { padding: clamp(15px, 1.8vw, 24px); position: relative; overflow: hidden; padding-top: clamp(24px, 2.6vw, 34px); }
+  .metric::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 10px; background: var(--accent); border-bottom: var(--border); }
+  .metric .num { font-family: var(--font-mono); font-weight: 800; font-size: clamp(1.5rem, 3.4vw, 2.7rem); line-height: 1; }
+  .metric .cap { margin-top: 8px; font-size: clamp(0.72rem, 1.2vw, 0.92rem); color: var(--muted); font-weight: 600; line-height: 1.3; }
+  .honest { margin-top: clamp(16px, 2.4vh, 26px); font-weight: 600; font-size: clamp(0.88rem, 1.5vw, 1.12rem); display: flex; flex-wrap: wrap; gap: 10px 22px; }
+  .honest span { display: inline-flex; align-items: center; gap: 8px; }
+  .sq { width: 14px; height: 14px; border: 2.5px solid var(--ink); display: inline-block; }
+
+  .links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(20px, 3vh, 34px); }
+
+  /* nav + progress */
+  .nav {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 52px; z-index: 30; display: flex; align-items: center; gap: 14px;
+    padding: 0 clamp(16px, 3vw, 36px); border-top: var(--border); background: var(--bg);
+  }
+  .rail { flex: 1; display: flex; gap: 5px; }
+  .seg { flex: 1; height: 12px; border: 2.5px solid var(--ink); background: var(--paper); cursor: pointer; }
+  .seg.on { background: var(--ink); }
+  .count { font-family: var(--font-mono); font-weight: 800; font-size: 0.9rem; min-width: 62px; text-align: right; font-variant-numeric: tabular-nums; }
+  .navbtn { border: 2.5px solid var(--ink); background: var(--yellow); box-shadow: var(--shadow-sm); font-weight: 800; font-size: 1rem; width: 40px; height: 34px; cursor: pointer; font-family: var(--font-display); }
+  .navbtn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+  .navbtn:focus-visible, .seg:focus-visible, a:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .hint { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+  @media (max-width: 720px) { .hint { display: none; } }
+
+  .notes {
+    position: fixed; left: 0; right: 0; bottom: 52px; z-index: 29; display: none; background: var(--ink); color: var(--bg);
+    border-top: var(--border); padding: 16px clamp(16px, 3vw, 36px); font-size: clamp(0.85rem, 1.5vw, 1.05rem);
+    line-height: 1.42; font-weight: 500; max-height: 42vh; overflow-y: auto;
+  }
+  .notes b { color: var(--yellow); font-family: var(--font-mono); }
+  body.notes-on .notes { display: block; }
+</style>
+
+<div class="deck" id="deck">
+
+  <!-- 1 · TITLE + INTRO -->
+  <section class="slide active" data-notes="[0:00] Hi, I'm <b>Mohammad Adab</b>. Among the five buildathon tracks, I chose <b>Revenue Recovery</b> — because there's a problem quietly bleeding subscription businesses dry, and most of them never even see it happen. Let me show you what it is, and what I built to stop it. This is Salus.">
+    <div class="wrap">
+      <div class="brandrow">
+        <div class="mark">₹⟳</div>
+        <div class="wordmark">SALUS</div>
+      </div>
+      <h1 class="display">Recovering the revenue that<br />fails <span class="accentword" style="--accent:var(--pink)">silently</span>.</h1>
+      <p class="lead" style="margin-top:20px">An autonomous agent that wins back failed payments — safely, on Razorpay.</p>
+    </div>
+    <div class="footerbar">
+      <span class="chip mono" style="background:var(--yellow)">[ your name ]</span>
+      <span class="chip">Razorpay AI Buildathon</span>
+      <span class="chip">Track 03 · Revenue Recovery</span>
+    </div>
+  </section>
+
+  <!-- 2 · INVOLUNTARY CHURN, DEFINED -->
+  <section class="slide" data-notes="[0:26] When we hear 'churn', we picture a customer who got fed up and cancelled. But a huge chunk of churn is something else entirely. It's called <b>involuntary churn</b> — the customer never chose to leave. Their card expired, or a bank glitch declined the charge, the payment failed, nobody recovered it, and the subscription just… died. They didn't quit. They were dropped.">
+    <div class="wrap">
+      <div class="kicker" style="--accent:var(--pink)">The problem most businesses never see</div>
+      <h2 class="h-md" style="margin-bottom:26px">Most churn isn't people leaving.<br />It's payments <span class="accentword" style="--accent:var(--pink)">failing</span>.</h2>
+      <div class="define">
+        <div class="block def vol">
+          <div class="tagword">Voluntary churn</div>
+          <p>The customer decided to cancel. A product problem — you can see it, and argue with it.</p>
+        </div>
+        <div class="block def invol">
+          <div class="tagword">Involuntary churn</div>
+          <p>A payment silently failed — expired card, insufficient funds, a bank decline. The customer never chose to leave. They were just dropped.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · THE DATA -->
+  <section class="slide" data-notes="[0:56] And it is not small. Across subscription businesses, <b>20 to 40 percent of all churn is involuntary</b> — payments, not people. Companies lose <b>4 to 9 percent of their monthly recurring revenue</b> to failed payments, every single month. And most of these failures are boring, fixable causes: expired cards, insufficient funds, soft declines from the bank.">
+    <div class="wrap">
+      <div class="kicker" style="--accent:var(--red)">The numbers</div>
+      <div class="stat2">
+        <div class="block statcard" style="--accent:var(--red)"><div class="n">20–40%</div><div class="c">of all subscription churn is <b>involuntary</b> — failed payments, not cancellations</div></div>
+        <div class="block statcard" style="--accent:var(--orange)"><div class="n">4–9%</div><div class="c">of monthly recurring revenue lost to failed payments — <b>every month</b></div></div>
+      </div>
+      <div class="block" style="padding:clamp(16px,2vw,24px)">
+        <div class="barhead">Why those payments fail</div>
+        <div class="bars">
+          <div class="bar"><span class="lab">Expired cards</span><span class="track"><span class="fill" style="width:65%;background:var(--pink)"></span></span><span class="pct">25–30%</span></div>
+          <div class="bar"><span class="lab">Insufficient funds</span><span class="track"><span class="fill" style="width:52%;background:var(--orange)"></span></span><span class="pct">20–25%</span></div>
+          <div class="bar"><span class="lab">Bank soft declines</span><span class="track"><span class="fill" style="width:40%;background:var(--yellow)"></span></span><span class="pct">15–20%</span></div>
+        </div>
+      </div>
+      <div class="src">Sources · Baremetrics · Recurly 2024 SaaS Payment Recovery Report · Churnkey benchmarks</div>
+    </div>
+  </section>
+
+  <!-- 4 · PREVENTABLE, BUT NOT PREVENTED -->
+  <section class="slide" data-notes="[1:26] Here's the frustrating part. None of this is inevitable. With the right timed retries, a fresh payment link, and a well-timed nudge, <b>40 to 85 percent of failed charges are recoverable</b>. The money is sitting right there. But recovering it means diagnosing every failure and acting on it, one by one — work nobody has the time to do by hand. So it doesn't get done. And the revenue leaks. Silently. Every month.">
+    <div class="wrap">
+      <div class="kicker" style="--accent:var(--green)">The gap</div>
+      <h2 class="display" style="font-size:clamp(1.8rem,4.6vw,3.4rem)"><span class="accentword" style="--accent:var(--green)">40–85%</span> is recoverable.<br />Most of it never gets recovered.</h2>
+      <p class="lead" style="margin-top:22px;max-width:56ch;font-weight:500">These are soft, fixable failures — a retry, a fresh link, a nudge would win them back. But that means working every failure by hand. So it doesn't happen, and the money quietly walks out the door.</p>
+    </div>
+  </section>
+
+  <!-- 5 · VULCAN -->
+  <section class="slide" data-notes="[1:52] Razorpay already tackled one half of this. Their model, Vulcan, predicts which payments will succeed and lifts the success rate. But prediction isn't recovery — something still has to go act on the payments that fail. That's the half I built. Vulcan is the brain that predicts. Salus is the hands that go win the money back.">
+    <div class="wrap">
+      <div class="kicker" style="--accent:var(--yellow)">Where Salus fits</div>
+      <div class="split">
+        <div class="block side vulcan">
+          <div class="role">Razorpay Vulcan</div>
+          <div class="name">Predicts</div>
+          <div class="sub">Scores every transaction and lifts the payment success rate.</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="block side salus">
+          <div class="role">Salus</div>
+          <div class="name">Recovers</div>
+          <div class="sub">Goes and wins back the payments that fail anyway.</div>
+        </div>
+      </div>
+      <p class="lead" style="margin-top:26px;max-width:52ch;font-weight:600">Vulcan is the brain. <span class="accentword">Salus is the hands.</span></p>
+    </div>
+  </section>
+
+  <!-- 6 · WHAT SALUS DOES -->
+  <section class="slide" data-notes="[2:16] So what does Salus actually do? For every at-risk payment, it runs one disciplined loop. It detects the failure, diagnoses the real root cause from Razorpay's own error signals, decides the right recovery for that exact cause, recovers it through Razorpay — a smart retry, a fresh payment link, a nudge — and audits every step it took.">
+    <div class="wrap">
+      <div class="kicker" style="--accent:var(--lime)">What Salus does</div>
+      <h2 class="h-md" style="margin-bottom:24px">One disciplined loop, for every failure.</h2>
+      <div class="steps">
+        <div class="block step"><div class="n">01</div><h3>Detect</h3><p>Catch the failed payment, drop-off, lapse or overdue invoice.</p></div>
+        <div class="block step"><div class="n">02</div><h3>Diagnose</h3><p>Real root cause from Razorpay's error signals.</p></div>
+        <div class="block step"><div class="n">03</div><h3>Decide</h3><p>The right recovery for that exact cause.</p></div>
+        <div class="block step"><div class="n">04</div><h3>Recover</h3><p>Smart retry, fresh link, or a well-timed nudge.</p></div>
+        <div class="block step"><div class="n">05</div><h3>Audit</h3><p>Every decision logged and explainable.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · THE CONTROL / GUARDRAILS -->
+  <section class="slide" data-notes="[2:44] Now, this thing moves real money — so it can't act on a whim. The agent decides what to try, but a deterministic rulebook decides what it's actually allowed to do. Retry caps. Contact limits. Quiet hours, so we never message someone at 3 a.m. A spend ceiling. And the one that matters most: a fraud-flagged payment is never auto-retried — it goes straight to a human. Every rupee-moving action is controlled and logged.">
+    <div class="wrap">
+      <div class="kicker" style="--accent:var(--orange)">Why it's safe with money</div>
+      <h2 class="h-md" style="margin-bottom:22px">It moves money — so it plays by a <span class="accentword" style="--accent:var(--orange)">rulebook it can't break</span>.</h2>
+      <div class="guards">
+        <div class="guard"><span class="g-t">Retry &amp; contact caps</span><span class="g-d">Never hammer a customer or a card.</span></div>
+        <div class="guard"><span class="g-t">Quiet hours</span><span class="g-d">No outreach 21:00–08:00 IST.</span></div>
+        <div class="guard"><span class="g-t">Spend ceiling</span><span class="g-d">Large amounts need a human's sign-off.</span></div>
+        <div class="guard hot"><span class="g-t">Fraud → human</span><span class="g-d">Flagged payments are never auto-retried.</span></div>
+        <div class="guard"><span class="g-t">Opt-out respected</span><span class="g-d">Suppressed customers are left alone.</span></div>
+        <div class="guard"><span class="g-t">Full audit trail</span><span class="g-d">Every action explainable and reversible.</span></div>
+      </div>
+      <p class="lead" style="margin-top:20px;max-width:60ch;font-weight:600">The agent proposes. The <span class="accentword" style="--accent:var(--green)">rulebook decides</span> — in code, not a prompt.</p>
+    </div>
+  </section>
+
+  <!-- 8 · ARCHITECTURE -->
+  <section class="slide" data-notes="[3:04] Architecturally it's one clean flow. An at-risk event is diagnosed, recoveries are planned, and every single one passes through the policy engine — allow, defer, block, or escalate — before it can touch money. Then it executes against Razorpay, records the outcome, and writes the audit trail. The policy engine is the gate nothing gets around.">
+    <div class="wrap">
+      <div class="kicker" style="--accent:var(--cyan)">Architecture</div>
+      <h2 class="h-md" style="margin-bottom:24px">Every action passes the gate.</h2>
+      <div class="flow">
+        <div class="node"><span class="lbl">Input</span><span class="val">At-risk event</span></div>
+        <div class="sep">→</div>
+        <div class="node"><span class="lbl">Reason</span><span class="val">Diagnose</span></div>
+        <div class="sep">→</div>
+        <div class="node"><span class="lbl">Plan</span><span class="val">Recoveries</span></div>
+        <div class="sep">→</div>
+        <div class="node gate"><span class="lbl">Policy engine</span><span class="val">allow / block / escalate</span></div>
+        <div class="sep">→</div>
+        <div class="node exec"><span class="lbl">Execute</span><span class="val">Razorpay</span></div>
+        <div class="sep">→</div>
+        <div class="node audit"><span class="lbl">Record</span><span class="val">Outcome + Audit</span></div>
+      </div>
+      <p class="flownote">reasoned recovery &nbsp;·&nbsp; <span class="accentword" style="--accent:var(--green)">gated by policy</span> &nbsp;·&nbsp; every step audited</p>
+    </div>
+  </section>
+
+  <!-- 9 · LIVE DEMO -->
+  <section class="slide liveslide" data-notes="[3:24 → SWITCH TO THE APP] Let me show you it's real, not slides. (1) I hit Run Recovery — the agent works 52 real at-risk payments in one pass, and you watch the recovered total climb. (2) I open a fraud-flagged case — and the policy engine REFUSES to auto-retry it, and escalates to a human. That's the guardrail, live. (3) And the moment that matters: in the Live panel, the agent creates a REAL Razorpay test-mode payment link. I open it, I pay it — and Salus syncs from Razorpay and marks it recovered. A real link, a real payment, really recovered.">
+    <div class="wrap">
+      <div class="livebig"><span class="dot">●</span> LIVE</div>
+      <div class="cuelist">
+        <div class="cue"><b>01</b> Run the batch — watch ₹ recovered climb across 52 payments</div>
+        <div class="cue"><b>02</b> Fraud flag → the policy engine <em>refuses</em> and escalates</div>
+        <div class="cue star"><b>03</b> A real Razorpay link → I pay it → it recovers, live</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 · RESULTS -->
+  <section class="slide" data-notes="[4:20] And it holds up, measured honestly. Across the batch: about ₹1.9 lakh recovered — 62 percent of what's actually addressable — for 14 rupees of cost. And I'm honest about the rest: 18 cases were correctly escalated to a human, not force-actioned. Plus the real ₹799 you just watched come back through Razorpay. No cherry-picking.">
+    <div class="wrap">
+      <div class="kicker" style="--accent:var(--green)">Measured honestly</div>
+      <div class="metrics">
+        <div class="block metric" style="--accent:var(--green)"><div class="num">₹1.9L</div><div class="cap">recovered across 52 at-risk payments</div></div>
+        <div class="block metric" style="--accent:var(--cyan)"><div class="num">62%</div><div class="cap">recovery rate on addressable revenue</div></div>
+        <div class="block metric" style="--accent:var(--yellow)"><div class="num">₹14</div><div class="cap">total cost — near-zero marginal</div></div>
+        <div class="block metric" style="--accent:var(--orange)"><div class="num">18</div><div class="cap">escalated to a human — not lost</div></div>
+      </div>
+      <div class="honest">
+        <span><span class="sq" style="background:var(--green)"></span> recovered</span>
+        <span><span class="sq" style="background:var(--orange)"></span> escalated ≠ lost</span>
+        <span><span class="sq" style="background:var(--blue)"></span> + a real <b class="mono">₹799</b> recovered live on Razorpay</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 · CLOSE -->
+  <section class="slide" data-notes="[4:38] Involuntary churn is revenue you already earned, leaking out through failed payments. Salus is the bounded agent that goes and wins it back — real recovery, real Razorpay, real guardrails. It's live and open-source. I'm Adab — thank you.">
+    <div class="wrap">
+      <div class="brandrow"><div class="mark">₹⟳</div><div class="wordmark" style="font-size:clamp(1.7rem,5.6vw,3.8rem)">SALUS</div></div>
+      <h2 class="display" style="font-size:clamp(1.7rem,4.4vw,3.2rem)">Win back the revenue<br />you already earned.</h2>
+      <p class="lead" style="margin-top:18px;font-weight:600">Real recovery · real Razorpay · real guardrails.</p>
+      <div class="links">
+        <span class="chip mono" style="background:var(--lime)">salus-u61h.onrender.com</span>
+        <span class="chip mono">github.com/adabismail/salus</span>
+        <span class="chip mono" style="background:var(--yellow)">[ Mohammad Adab ] · thank you ✦</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="notes" id="notes"></div>
+
+<nav class="nav">
+  <button class="navbtn" id="prev" aria-label="Previous slide">‹</button>
+  <button class="navbtn" id="next" aria-label="Next slide">›</button>
+  <div class="rail" id="rail"></div>
+  <span class="hint">← → move · N notes · F11 fullscreen</span>
+  <span class="count mono" id="count">01 / 11</span>
+</nav>
+
+<script>
+  (function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+    var rail = document.getElementById("rail");
+    var count = document.getElementById("count");
+    var notes = document.getElementById("notes");
+    var i = 0;
+    slides.forEach(function (_, k) {
+      var s = document.createElement("button");
+      s.className = "seg"; s.setAttribute("aria-label", "Go to slide " + (k + 1));
+      s.addEventListener("click", function (e) { e.stopPropagation(); show(k); });
+      rail.appendChild(s);
+    });
+    var segs = Array.prototype.slice.call(rail.children);
+    function pad(n) { return (n < 10 ? "0" : "") + n; }
+    function show(n) {
+      i = Math.max(0, Math.min(slides.length - 1, n));
+      slides.forEach(function (s, k) { s.classList.toggle("active", k === i); });
+      segs.forEach(function (s, k) { s.classList.toggle("on", k <= i); });
+      count.textContent = pad(i + 1) + " / " + pad(slides.length);
+      notes.innerHTML = slides[i].getAttribute("data-notes") || "";
+    }
+    document.getElementById("next").addEventListener("click", function (e) { e.stopPropagation(); show(i + 1); });
+    document.getElementById("prev").addEventListener("click", function (e) { e.stopPropagation(); show(i - 1); });
+    document.addEventListener("keydown", function (e) {
+      if (["ArrowRight", " ", "PageDown"].indexOf(e.key) > -1) { e.preventDefault(); show(i + 1); }
+      else if (["ArrowLeft", "PageUp"].indexOf(e.key) > -1) { e.preventDefault(); show(i - 1); }
+      else if (e.key === "Home") { show(0); }
+      else if (e.key === "End") { show(slides.length - 1); }
+      else if (e.key === "n" || e.key === "N") { document.body.classList.toggle("notes-on"); }
+    });
+    document.getElementById("deck").addEventListener("click", function (e) {
+      if (e.target.closest("a")) return;
+      show(i + 1);
+    });
+    show(0);
+  })();
+</script>
