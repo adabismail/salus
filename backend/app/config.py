@@ -40,5 +40,13 @@ class Settings:
     def llm_enabled(self) -> bool:
         return bool(self.ANTHROPIC_API_KEY)
 
+    @property
+    def masked_key_id(self) -> str | None:
+        """A safe-to-display form of the Key ID — never expose the full value."""
+        k = self.RAZORPAY_KEY_ID
+        if not k:
+            return None
+        return f"{k[:9]}••••{k[-2:]}" if len(k) > 12 else "••••"
+
 
 settings = Settings()

@@ -23,7 +23,7 @@ def verify() -> dict:
     return {
         "ok": ok,
         "status_code": r.status_code,
-        "key_id": settings.RAZORPAY_KEY_ID,
+        "key_id": settings.masked_key_id,
         "test_mode": (settings.RAZORPAY_KEY_ID or "").startswith("rzp_test_"),
         "detail": None if ok else r.text[:300],
     }

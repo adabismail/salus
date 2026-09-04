@@ -38,7 +38,7 @@ def get_config() -> dict:
         "mode": settings.MODE,
         "razorpay_live": settings.razorpay_live,
         "razorpay_configured": settings.razorpay_configured,
-        "key_id": settings.RAZORPAY_KEY_ID,
+        "key_id": settings.masked_key_id,
         "llm_enabled": settings.llm_enabled,
         "seed": store.seed,
         "batch_size": len(store.events),
@@ -209,7 +209,7 @@ def live_state() -> dict:
     paid = [l for l in links if l.get("status") == "paid"]
     return {
         "configured": settings.razorpay_configured,
-        "key_id": settings.RAZORPAY_KEY_ID,
+        "key_id": settings.masked_key_id,
         "count": len(links),
         "created_paise": sum(l["amount_paise"] for l in links),
         "paid": len(paid),
